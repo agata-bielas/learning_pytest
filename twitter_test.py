@@ -1,22 +1,20 @@
-import unittest
+import pytest
 from twitter import Twitter
 
 
-class TwitterTest(unittest.TestCase):
-    # Given - metoda setUp wykona sie przed kazdym testem
-    def setUp(self):
-        self.twitter = Twitter()
+def test_twitter_initialization():
+    twitter = Twitter()
+    assert twitter
 
 
-    def test_initialization(self):
-        self.assertTrue(self.twitter)
-
-    def test_tweet_single(self):
-        # When
-        self.twitter.tweet('Test message')
-        # Then
-        self.assertEqual(self.twitter.tweets, ['Test Message'])
+def test_tweet_single_message():
+    twitter = Twitter()
+    twitter.tweet("Test Message")
+    assert twitter.tweets == ["Test Message"]
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_tweet_long_message():
+    twitter = Twitter()
+    with pytest.raises(Exception):
+        twitter.tweet('test'*41)
+    assert twitter.tweets == []
