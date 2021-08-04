@@ -13,7 +13,7 @@ class Twitter(object):
         self.tweets.append(message)
 
     def find_hashtags(self, message):
-        return re.findall("#(\w+) ", message)
+        return re.findall("#(\w+)", message)
 
 
 if __name__ == '__main__':
