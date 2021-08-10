@@ -5,7 +5,8 @@ from twitter import Twitter
 @pytest.fixture
 def twitter():
     twitter = Twitter()
-    return twitter
+    yield twitter
+    twitter.delete()
 
 
 def test_twitter_initialization(twitter):
