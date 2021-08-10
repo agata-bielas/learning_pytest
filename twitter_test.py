@@ -5,11 +5,8 @@ from twitter import Twitter
 @pytest.fixture
 def twitter(request):
     twitter = Twitter()
-
-    def fin():
-        twitter.delete()
-    request.addfinalizer(fin)
-    return twitter
+    yield twitter
+    twitter.delete()
 
 
 def test_twitter_initialization(twitter):
