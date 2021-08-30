@@ -1,25 +1,33 @@
+import json
 import re
 
 
 class Twitter(object):
     version = '1.0'
 
-    def __init__(self, backend=None):
+    def __init__(self, backend=None, username=None):
         self.backend = backend
         self._tweets = []
+        self.username = username
 
     @property
     def tweets(self):
         if self.backend and not self._tweets:
-            self._tweets = [line.rstrip('\n') for line in self.backend.readlines()]
+            backend_text = self.backend.read()
+            if backend_text:
+                self._tweets = json.loads(backend_text)
         return self._tweets
+
+    @property
+    def tweet_messages(self):
+        return [tweet['message'] for tweet in self.tweets]
 
     def tweet(self, message):
         if len(message) > 160:
             raise Exception("Message too long.")
-        self.tweets.append(message)
+        self.tweets.append({'message': message})
         if self.backend:
-            self.backend.write("\n".join(self.tweets))
+            self.backend.write(json.dumps(self.tweets))
 
     def find_hashtags(self, message):
         return [m.lower() for m in re.findall("#(\w+)", message)]
