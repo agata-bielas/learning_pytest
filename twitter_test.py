@@ -8,13 +8,17 @@ def fixture_backend(tmpdir):
     temp_file.write('')
     return temp_file
 
+@pytest.fixture(params=[None, 'python'], name='username')
+def fixture_username(request):
+    return request.param
+
 
 @pytest.fixture(params=['list', 'backend'], name='twitter')
-def fixture_twitter(backend, request):
+def fixture_twitter(backend, username, request):
     if request.param == 'list':
-        twitter = Twitter()
+        twitter = Twitter(username=username)
     elif request.param == 'backend':
-        twitter = Twitter(backend=backend)
+        twitter = Twitter(backend=backend, username=username)
     return twitter
 
 
