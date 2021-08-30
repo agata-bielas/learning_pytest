@@ -1,5 +1,9 @@
 import json
 import re
+from urllib.parse import urljoin
+import requests
+
+USER_API = "https://api.github.com/users"
 
 
 class Twitter(object):
@@ -22,10 +26,19 @@ class Twitter(object):
     def tweet_messages(self):
         return [tweet['message'] for tweet in self.tweets]
 
+    def get_user_avatar(self):
+        if not self.username:
+            return None
+
+        url = urljoin(USER_API, self.username)
+        res = requests.get(url)
+        return res.json()['documentation_url']
+
+
     def tweet(self, message):
         if len(message) > 160:
             raise Exception("Message too long.")
-        self.tweets.append({'message': message})
+        self.tweets.append({'message': message, 'avatar': self.get_user_avatar()})
         if self.backend:
             self.backend.write(json.dumps(self.tweets))
 
