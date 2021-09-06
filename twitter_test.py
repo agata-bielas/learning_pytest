@@ -1,10 +1,12 @@
+from unittest.mock import patch, Mock, MagicMock
 import pytest
+import requests
 from twitter import Twitter
 
 
 class ResponseGetMock(object):
     def json(self):
-        return {'avatar_url': 'test'}
+        return {'documentation_url': 'test'}
 
 
 @pytest.fixture(autouse=True)
@@ -25,16 +27,11 @@ def fixture_username(request):
 
 
 @pytest.fixture(params=['list', 'backend'], name='twitter')
-def fixture_twitter(backend, username, request, monkeypatch):
+def fixture_twitter(backend, username, request):
     if request.param == 'list':
         twitter = Twitter(username=username)
     elif request.param == 'backend':
         twitter = Twitter(backend=backend, username=username)
-
-    def monkey_return():
-        return 'test'
-
-    monkeypatch.setattr(twitter, 'get_user_avatar', monkey_return)
     return twitter
 
 
@@ -42,7 +39,8 @@ def test_twitter_initialization(twitter):
     assert twitter
 
 
-def test_tweet_single_messages(twitter):
+@patch.object(requests, 'get', return_value=ResponseGetMock())
+def test_tweet_single_messages(avatar_mock, twitter):
     twitter.tweet("Test Message")
     assert twitter.tweet_messages == ["Test Message"]
 
@@ -75,9 +73,28 @@ def test_tweet_with_hashtag(twitter, message, expected):
     assert twitter.find_hashtags(message) == expected
 
 
-def test_tweet_with_username(twitter):
+@patch.object(requests, 'get', return_value=ResponseGetMock())
+def test_tweet_with_username(avatar_mock, twitter):
     if not twitter.username:
         pytest.skip()
 
     twitter.tweet('Test message')
-    assert twitter.tweets == [{'message': "Test message", 'avatar': 'test'}]
+    assert twitter.tweets == [{'avatar': 'test', 'message': "Test message", 'hashtags': []}]
+    # to poniżej pozwala nam sprawdzic czy funkcja get_user_avatar byla wywolana podczas testu
+    avatar_mock.assert_called()
+
+
+@patch.object(requests, 'get', return_value=ResponseGetMock())
+def test_tweet_with_hashtag_mock(avatar_mock, twitter):
+    twitter.find_hashtags = Mock()
+    twitter.find_hashtags.return_value = 'first'
+    twitter.tweet("Test #second")
+    assert twitter.tweets[0]['hashtags'] == 'first'
+    # sprawdzenie czy mock byl wywolany z takim argumentem
+    twitter.find_hashtags.assert_called_with("Test #second")
+
+
+def test_twitter_version(twitter):
+    twitter.version = MagicMock()
+    twitter.version.__eq__.return_value = '2.0'
+    assert twitter.version == '2.0'
