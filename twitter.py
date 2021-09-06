@@ -34,7 +34,6 @@ class Twitter(object):
         res = requests.get(url)
         return res.json()['documentation_url']
 
-
     def tweet(self, message):
         if len(message) > 160:
             raise Exception("Message too long.")
