@@ -9,18 +9,6 @@ class ResponseGetMock(object):
         return {'documentation_url': 'test'}
 
 
-@pytest.fixture(autouse=True)
-def no_requests(monkeypatch):
-    monkeypatch.delattr('requests.sessions.Session.request')
-
-
-@pytest.fixture(name='backend')
-def fixture_backend(tmpdir):
-    temp_file = tmpdir.join('test.txt')
-    temp_file.write('')
-    return temp_file
-
-
 @pytest.fixture(params=[None, 'python'], name='username')
 def fixture_username(request):
     return request.param
@@ -80,7 +68,7 @@ def test_tweet_with_username(avatar_mock, twitter):
 
     twitter.tweet('Test message')
     assert twitter.tweets == [{'avatar': 'test', 'message': "Test message", 'hashtags': []}]
-    # to poniżej pozwala nam sprawdzic czy funkcja get_user_avatar byla wywolana podczas testu
+    # to ponizej pozwala nam sprawdzic czy funkcja get_user_avatar byla wywolana podczas testu
     avatar_mock.assert_called()
 
 
@@ -98,3 +86,17 @@ def test_twitter_version(twitter):
     twitter.version = MagicMock()
     twitter.version.__eq__.return_value = '2.0'
     assert twitter.version == '2.0'
+
+
+@patch.object(requests, 'get', return_value=ResponseGetMock())
+def test_twitter_get_all_hashtags(avatar_mock,twitter):
+    twitter.tweet("Test #first")
+    twitter.tweet("Test #first #second")
+    twitter.tweet("Test #third")
+    assert twitter.get_all_hashtags() == {'first', 'second', 'third'}
+
+
+@patch.object(requests, 'get', return_value=ResponseGetMock())
+def test_twitter_get_all_hashtags_not_found(avatar_mock,twitter):
+    twitter.tweet("Test first")
+    assert twitter.get_all_hashtags() == 'No hashtags found'

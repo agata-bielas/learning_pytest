@@ -48,9 +48,12 @@ class Twitter(object):
     def find_hashtags(self, message):
         return [m.lower() for m in re.findall("#(\w+)", message)]
 
+    def get_all_hashtags(self):
+        hashtags = []
+        for message in self.tweets:
+            hashtags.extend(message['hashtags'])
+        if hashtags:
+            return set(hashtags)
 
-if __name__ == '__main__':
-    twitter = Twitter()
-    print(twitter.version, twitter.tweets)
-    twitter.tweet("This is a test message")
-    print(twitter.tweets)
+        return "No hashtags found"
+
