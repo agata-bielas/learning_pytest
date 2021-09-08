@@ -31,6 +31,7 @@ class Twitter(object):
             return None
 
         url = urljoin(USER_API, self.username)
+        import pdb; pdb.set_trace()
         res = requests.get(url)
         return res.json()['documentation_url']
 
