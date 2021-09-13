@@ -89,7 +89,7 @@ def test_twitter_version(twitter):
 
 
 @patch.object(requests, 'get', return_value=ResponseGetMock())
-def test_twitter_get_all_hashtags(avatar_mock,twitter):
+def test_twitter_get_all_hashtags(avatar_mock, twitter):
     twitter.tweet("Test #first")
     twitter.tweet("Test #first #second")
     twitter.tweet("Test #third")
@@ -97,6 +97,6 @@ def test_twitter_get_all_hashtags(avatar_mock,twitter):
 
 
 @patch.object(requests, 'get', return_value=ResponseGetMock())
-def test_twitter_get_all_hashtags_not_found(avatar_mock,twitter):
+def test_twitter_get_all_hashtags_not_found(avatar_mock, twitter):
     twitter.tweet("Test first")
     assert twitter.get_all_hashtags() == 'No hashtags found'
