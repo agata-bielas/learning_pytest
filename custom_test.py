@@ -1,5 +1,6 @@
+import pytest
 
-
+@pytest.mark.skip
 def test_sum():
     assert 2+2 == 4
 
