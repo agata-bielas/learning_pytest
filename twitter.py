@@ -31,7 +31,7 @@ class Twitter(object):
             return None
 
         url = urljoin(USER_API, self.username)
-        import wdb; wdb.set_trace()
+        # import wdb; wdb.set_trace()
         res = requests.get(url)
         return res.json()['documentation_url']
 
