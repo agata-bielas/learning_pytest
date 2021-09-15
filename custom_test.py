@@ -1,6 +1,7 @@
+import os
 import pytest
 
-@pytest.mark.skip
+@pytest.mark.skipif(os.environ.get('NO_SUMMINT')=='1', reason='NO_SUMMING set to 1')
 def test_sum():
     assert 2+2 == 4
 
