@@ -8,7 +8,8 @@ def test_initial():
 
 @pytest.mark.parametrize('message1, message2', (
         ('test', 'not test'),
-        ('not test', 'test')
+        ('not test', 'test'),
+        ('test', 'tessssst')
 ))
 def test_not_anagram(message1, message2):
     assert not is_anagram(message1, message2)
